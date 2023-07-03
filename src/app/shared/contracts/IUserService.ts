@@ -1,5 +1,7 @@
 import { IErrorMessage } from "./Global";
 
+export type IUserServiceClient = Pick<IUserService, "register">;
+
 export interface IUserService {
   register(request: IRegisterRequest): Promise<IRegisterResult>;
   getUser(request: IGetUserRequest): Promise<IGetUserResult>;

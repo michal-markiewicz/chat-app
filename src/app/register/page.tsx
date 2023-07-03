@@ -1,15 +1,26 @@
 "use client";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import UserService from "../client/UserService";
 import DataValidator from "../shared/helpers/DataValidator";
 import "./register.css";
 
 const Register = () => {
+  const userService = new UserService();
   const dataValidator = new DataValidator();
   const [username, setUsername] = useState("");
   const [usernameValidationError, setUsernameValidationError] = useState("");
   const [password, setPassword] = useState("");
   const [passwordValidationError, setPasswordValidationError] = useState("");
+  const [anyValidationErrors, setAnyValidationErrors] = useState(false);
+
+  useEffect(() => {
+    if (usernameValidationError || passwordValidationError) {
+      setAnyValidationErrors(true);
+    } else {
+      setAnyValidationErrors(false);
+    }
+  }, [usernameValidationError, passwordValidationError]);
 
   return (
     <Box className="register-page-wrapper flex justify-center items-center flex-col w-screen h-screen">
@@ -45,7 +56,18 @@ const Register = () => {
             );
           }}
         />
-        <Button variant="contained" className="w-36 mt-8">
+        <Button
+          variant="contained"
+          className="w-36 mt-8"
+          onClick={async () => {
+            if (!anyValidationErrors) {
+              const registrationResult = await userService.register({
+                username,
+                password,
+              });
+            }
+          }}
+        >
           Sign Up
         </Button>
         <Typography className="mt-8">
