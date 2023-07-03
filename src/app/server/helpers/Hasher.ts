@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { IHasher } from "../contracts/IHasher";
+import { IHasher } from "../../shared/contracts/IHasher";
 
 export default class Hasher implements IHasher {
   private readonly saltRounds: number = 10;
