@@ -22,8 +22,8 @@ export interface IGetUserRequest {
 export interface IGetUserResult extends IUser, IErrorMessage {}
 
 export interface IUser {
-  id?: number | string;
   username?: string;
+  password?: string;
 }
 
 export interface IDeleteUserRequest extends IUser {}

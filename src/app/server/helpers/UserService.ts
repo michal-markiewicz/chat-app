@@ -63,7 +63,7 @@ class UserService implements IUserService {
 
     if (username) {
       const [result] = await dbConnection.execute<RowDataPacket[]>(
-        "SELECT username FROM user WHERE username = ?",
+        "SELECT username, password FROM user WHERE username = ?",
         [username]
       );
       rows.push(...result);
@@ -73,6 +73,7 @@ class UserService implements IUserService {
       const user = rows[0];
       return {
         username: user.username,
+        password: user.password,
         errorMsg: "",
       };
     }
