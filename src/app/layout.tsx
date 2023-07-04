@@ -1,13 +1,7 @@
 "use client";
 import { ThemeProvider } from "@mui/material";
-import { Poppins } from "next/font/google";
 import "./globals.css";
 import theme from "./theme";
-
-const poppins = Poppins({
-  weight: ["300", "400", "500", "600", "700"],
-  subsets: ["latin-ext"],
-});
 
 export const metadata = {
   title: "Create Next App",
@@ -22,7 +16,7 @@ export default function RootLayout({
   return (
     <ThemeProvider theme={theme}>
       <html lang="en">
-        <body>{children}</body>
+        <body id="__next">{children}</body>
       </html>
     </ThemeProvider>
   );
