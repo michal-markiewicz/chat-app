@@ -1,5 +1,5 @@
-"use client";
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import UserService from "../client/UserService";
 import DataValidator from "../shared/helpers/DataValidator";
@@ -65,6 +65,14 @@ const Register = () => {
                 username,
                 password,
               });
+
+              const result = await signIn("credentials", {
+                redirect: false,
+                username,
+                password,
+              });
+
+              console.log(result);
             }
           }}
         >

@@ -17,3 +17,20 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function GET(req: NextRequest) {
+  if (req.body) {
+    const user = await req.json();
+    const userService = new UserService();
+    const getUserResult = await userService.getUser(user);
+
+    return NextResponse.json(
+      {
+        ...getUserResult,
+      },
+      {
+        status: 200,
+      }
+    );
+  }
+}
