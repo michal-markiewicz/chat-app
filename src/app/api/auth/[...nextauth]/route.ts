@@ -7,7 +7,7 @@ const hasher = new Hasher();
 const userService = new UserService();
 
 export const authOptions = {
-  secret: process.env.SECRET,
+  secret: process.env.AUTH_SECRET,
   providers: [
     CredentialsProvider({
       name: "Credentials",
