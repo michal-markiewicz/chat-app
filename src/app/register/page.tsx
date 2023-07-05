@@ -1,12 +1,14 @@
 "use client";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import UserService from "../client/UserService";
 import DataValidator from "../shared/helpers/DataValidator";
 import "./register.css";
 
 const Register = () => {
+  const session = useSession();
+  console.log(session);
   const userService = new UserService();
   const dataValidator = new DataValidator();
   const [username, setUsername] = useState("");
