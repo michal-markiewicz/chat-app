@@ -22,6 +22,7 @@ export interface IGetUserRequest {
 export interface IGetUserResult extends IUser, IErrorMessage {}
 
 export interface IUser {
+  id?: string;
   username?: string;
   password?: string;
 }

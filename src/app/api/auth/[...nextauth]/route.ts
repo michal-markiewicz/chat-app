@@ -24,7 +24,7 @@ export const authOptions = {
           username: credentials.username,
         });
 
-        if (user.password) {
+        if (user.id && user.username && user.password) {
           const passwordMatch = await hasher.comparePasswords(
             credentials.password,
             user.password
@@ -32,8 +32,8 @@ export const authOptions = {
 
           if (passwordMatch) {
             return {
-              id: "1",
-              username: user.username,
+              id: user.id,
+              name: user.username,
             };
           }
         }
