@@ -11,35 +11,54 @@ const Chat = () => {
   const session = useSession();
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [webSocketServerRunning, setWebSocketServerRunning] = useState(false);
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
 
-  // This code is obviously trash, but it's just for testing purposes
-  useEffect(() => {
-    if (!webSocketServerRunning) {
-      const result = axios.post("/api/socket").then(() => {
-        console.log("serwer chyba odpalony");
-        setWebSocketServerRunning(true);
-      });
-    } else {
-      const socket = new WebSocket("ws://localhost:443");
-      setWebSocket(socket);
-    }
-  }, [webSocketServerRunning]);
+  async function startWebSocketServer() {
+    await axios.post("/api/socket");
+  }
 
-  console.log("webSocket", webSocket);
+  function connectToWebSocketServer() {
+    const ws = new WebSocket("ws://localhost:443");
 
-  if (webSocket) {
-    webSocket.onopen = function (event) {
+    ws.onopen = (event) => {
       console.log("onopen", event);
     };
-    webSocket.onmessage = function (event) {
+    ws.onmessage = (event) => {
       console.log("onmessage", event);
     };
-    webSocket.onerror = function (event) {
+    ws.onerror = (event) => {
       console.log("onerror", event);
     };
+
+    setWebSocket(ws);
   }
+
+  function isWebSocketServerRunning(): Promise<boolean> {
+    return new Promise((resolve) => {
+      const ws = new WebSocket("ws://localhost:443");
+
+      ws.onopen = () => {
+        resolve(true);
+        ws.close();
+      };
+
+      ws.onerror = () => {
+        resolve(false);
+      };
+    });
+  }
+
+  useEffect(() => {
+    const initializeWebSocketConnection = async () => {
+      const isServerRunning = await isWebSocketServerRunning();
+      if (!isServerRunning) {
+        await startWebSocketServer();
+      }
+      connectToWebSocketServer();
+    };
+
+    initializeWebSocketConnection();
+  }, []);
 
   return (
     <Box className="chat-container flex w-full h-full flex-col items-center">

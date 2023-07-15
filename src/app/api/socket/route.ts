@@ -6,10 +6,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     port: 443,
   });
 
-  console.log("ws", ws);
+  console.log("WebSockets server is starting :)");
 
   ws.on("connection", (ws, req) => {
-    console.log("req", req);
     ws.on("error", console.error);
 
     ws.on("message", (data) => {
