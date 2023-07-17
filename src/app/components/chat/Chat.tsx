@@ -11,7 +11,26 @@ const Chat = () => {
   const session = useSession();
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    const initializeWebSocketConnection = async () => {
+      const isServerRunning = await isWebSocketServerRunning();
+      if (!isServerRunning) {
+        await startWebSocketServer();
+      }
+      connectToWebSocketServer();
+    };
+
+    initializeWebSocketConnection();
+  }, []);
+
+  useEffect(() => {
+    if (ws) {
+      const lastMessage = messages[messages.length - 1];
+      ws.send(JSON.stringify(lastMessage));
+    }
+  }, [messages.length]);
 
   async function startWebSocketServer() {
     await axios.post("/api/socket");
@@ -30,7 +49,7 @@ const Chat = () => {
       console.log("onerror", event);
     };
 
-    setWebSocket(ws);
+    setWs(ws);
   }
 
   function isWebSocketServerRunning(): Promise<boolean> {
@@ -47,18 +66,6 @@ const Chat = () => {
       };
     });
   }
-
-  useEffect(() => {
-    const initializeWebSocketConnection = async () => {
-      const isServerRunning = await isWebSocketServerRunning();
-      if (!isServerRunning) {
-        await startWebSocketServer();
-      }
-      connectToWebSocketServer();
-    };
-
-    initializeWebSocketConnection();
-  }, []);
 
   return (
     <Box className="chat-container flex w-full h-full flex-col items-center">
@@ -84,7 +91,7 @@ const Chat = () => {
                       const newMessage = {
                         sender: "John Doe",
                         content: messageContent,
-                        time: new Date(),
+                        date: new Date(),
                       };
                       setMessages((prev) => [...prev, newMessage]);
                     }

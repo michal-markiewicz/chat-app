@@ -6,14 +6,14 @@ import "./ChatMessage.css";
 export interface Message {
   sender: string;
   content: string;
-  time: Date;
+  date: string | Date;
 }
 interface ChatMessageProps extends Message {}
 
 const ChatMessage = (props: ChatMessageProps) => {
-  const { sender, content, time } = props;
+  const { sender, content, date } = props;
 
-  const formattedTime = dayjs(time).format("hh:mm A");
+  const formattedTime = dayjs(date).format("hh:mm A");
   return (
     <Box className="flex gap-4 mt-6">
       <Box className="pt-4">

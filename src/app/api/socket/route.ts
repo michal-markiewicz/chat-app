@@ -12,7 +12,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     ws.on("error", console.error);
 
     ws.on("message", (data) => {
-      console.log("received: %s", data);
+      console.log(JSON.parse(data));
     });
 
     ws.send("Handshake :)");
