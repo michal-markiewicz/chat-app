@@ -28,12 +28,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const messages = await chatService.fetchMessages();
-  return NextResponse.json(
-    {
-      messages,
-    },
-    {
-      status: 200,
-    }
-  );
+  return NextResponse.json(messages, {
+    status: 200,
+  });
 }

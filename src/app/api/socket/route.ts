@@ -1,21 +1,26 @@
+import ChatService from "@/app/server/helpers/ChatService";
 import { NextRequest, NextResponse } from "next/server";
 import { WebSocketServer } from "ws";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-  const ws = new WebSocketServer({
+  const chatService = new ChatService();
+  const wss = new WebSocketServer({
     port: 443,
   });
 
-  console.log("WebSockets server is starting :)");
-
-  ws.on("connection", (ws, req) => {
+  wss.on("connection", (ws, req) => {
     ws.on("error", console.error);
+    ws.on("message", async (data) => {
+      const newMessageJson = data.toString();
+      const newMessage = JSON.parse(newMessageJson);
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(newMessageJson);
+        }
+      });
 
-    ws.on("message", (data) => {
-      console.log(JSON.parse(data));
+      await chatService.saveMessage(newMessage);
     });
-
-    ws.send("Handshake :)");
   });
 
   return NextResponse.json(

@@ -1,3 +1,4 @@
+import ChatService from "@/app/client/ChatService";
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, TextField } from "@mui/material";
@@ -8,6 +9,7 @@ import ChatMessage, { Message } from "../chatMessage/ChatMessage";
 import "./Chat.css";
 
 const Chat = () => {
+  const chatService = new ChatService();
   const session = useSession();
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,11 +28,10 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    if (ws) {
-      const lastMessage = messages[messages.length - 1];
-      ws.send(JSON.stringify(lastMessage));
-    }
-  }, [messages.length]);
+    chatService.fetchMessages().then((messages) => {
+      setMessages(messages);
+    });
+  }, []);
 
   async function startWebSocketServer() {
     await axios.post("/api/socket");
@@ -42,9 +43,12 @@ const Chat = () => {
     ws.onopen = (event) => {
       console.log("onopen", event);
     };
+
     ws.onmessage = (event) => {
-      console.log("onmessage", event);
+      const newMessage = JSON.parse(event.data);
+      setMessages((prev) => [...prev, newMessage]);
     };
+
     ws.onerror = (event) => {
       console.log("onerror", event);
     };
@@ -86,14 +90,15 @@ const Chat = () => {
               <>
                 <FontAwesomeIcon
                   icon={faPaperPlane}
-                  onClick={() => {
+                  onClick={async () => {
                     if (messageContent) {
                       const newMessage = {
-                        sender: "John Doe",
+                        sender: session.data?.user?.name as string,
                         content: messageContent,
                         date: new Date(),
                       };
-                      setMessages((prev) => [...prev, newMessage]);
+
+                      ws?.send(JSON.stringify(newMessage));
                     }
                   }}
                 />
