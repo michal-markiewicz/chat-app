@@ -1,3 +1,11 @@
 .chat-container {
   background-color: rgb(245, 245, 245);
 }
+
+.chat-messages {
+  overflow-y: scroll;
+}
+
+.send-message-icon {
+  cursor: pointer;
+}

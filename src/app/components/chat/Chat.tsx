@@ -73,7 +73,7 @@ const Chat = () => {
 
   return (
     <Box className="chat-container flex w-full h-full flex-col items-center">
-      <Box className="w-11/12 h-full">
+      <Box className="chat-messages w-11/12 h-full pb-4">
         {messages.map((message) => {
           return <ChatMessage {...message} />;
         })}
@@ -89,6 +89,7 @@ const Chat = () => {
             endAdornment: (
               <>
                 <FontAwesomeIcon
+                  className="send-message-icon"
                   icon={faPaperPlane}
                   onClick={async () => {
                     if (messageContent) {
