@@ -1,7 +1,7 @@
 import ChatService from "@/app/client/ChatService";
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
@@ -13,19 +13,22 @@ const Chat = () => {
   const session = useSession();
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [users, setUsers] = useState<string[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const initializeWebSocketConnection = async () => {
-      const isServerRunning = await isWebSocketServerRunning();
-      if (!isServerRunning) {
-        await startWebSocketServer();
-      }
-      connectToWebSocketServer();
-    };
+    if (session.data?.user?.name) {
+      const initializeWebSocketConnection = async () => {
+        const isServerRunning = await isWebSocketServerRunning();
+        if (!isServerRunning) {
+          await startWebSocketServer();
+        }
+        connectToWebSocketServer();
+      };
 
-    initializeWebSocketConnection();
-  }, []);
+      initializeWebSocketConnection();
+    }
+  }, [session.data?.user?.name]);
 
   useEffect(() => {
     chatService.fetchMessages().then((messages) => {
@@ -41,12 +44,27 @@ const Chat = () => {
     const ws = new WebSocket("ws://localhost:443");
 
     ws.onopen = (event) => {
-      console.log("onopen", event);
+      const user = {
+        username: session.data?.user?.name,
+        type: "user-connected",
+      };
+
+      const userJson = JSON.stringify(user);
+      ws.send(userJson);
     };
 
     ws.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages((prev) => [...prev, newMessage]);
+      const data = JSON.parse(event.data);
+
+      switch (data.type) {
+        case "message":
+          delete data.type;
+          setMessages((prev) => [...prev, data]);
+          break;
+        case "users":
+          setUsers(data.users);
+          break;
+      }
     };
 
     ws.onerror = (event) => {
@@ -78,6 +96,19 @@ const Chat = () => {
           return <ChatMessage {...message} />;
         })}
       </Box>
+      <Box className="flex w-full justify-center pt-2 pb-2">
+        <Typography className="w-11/12">
+          Online ({users.length}):{" "}
+          {users.map((user, index) => {
+            return (
+              <>
+                {user}
+                {index < users.length - 1 ? ", " : ""}
+              </>
+            );
+          })}
+        </Typography>
+      </Box>
       <Box className="message-input-container flex items-center justify-center h-20 w-full pb-4">
         <TextField
           label={"Message to Channel 1"}
@@ -97,9 +128,11 @@ const Chat = () => {
                         sender: session.data?.user?.name as string,
                         content: messageContent,
                         date: new Date(),
+                        type: "message",
                       };
 
-                      ws?.send(JSON.stringify(newMessage));
+                      const newMessageJson = JSON.stringify(newMessage);
+                      ws?.send(newMessageJson);
                     }
                   }}
                 />

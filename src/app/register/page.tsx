@@ -1,6 +1,7 @@
 "use client";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import UserService from "../client/UserService";
 import DataValidator from "../shared/helpers/DataValidator";
@@ -8,7 +9,7 @@ import "./register.css";
 
 const Register = () => {
   const session = useSession();
-  console.log(session);
+  const router = useRouter();
   const userService = new UserService();
   const dataValidator = new DataValidator();
   const [username, setUsername] = useState("");
@@ -75,7 +76,9 @@ const Register = () => {
                 password,
               });
 
-              console.log(result);
+              if (result?.ok) {
+                router.push("/");
+              }
             }
           }}
         >
