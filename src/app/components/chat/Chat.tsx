@@ -16,6 +16,21 @@ const Chat = () => {
   const [users, setUsers] = useState<string[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
 
+  function sendChatMessage() {
+    if (messageContent) {
+      const newMessage = {
+        sender: session.data?.user?.name as string,
+        content: messageContent,
+        date: new Date(),
+        type: "message",
+      };
+
+      setMessageContent("");
+      const newMessageJson = JSON.stringify(newMessage);
+      ws?.send(newMessageJson);
+    }
+  }
+
   useEffect(() => {
     if (session.data?.user?.name) {
       const initializeWebSocketConnection = async () => {
@@ -35,6 +50,19 @@ const Chat = () => {
       setMessages(messages);
     });
   }, []);
+
+  const handleEnterKeyUp = (e) => {
+    if (e.key === "Enter") {
+      sendChatMessage();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keyup", handleEnterKeyUp);
+    return () => {
+      window.removeEventListener("keyup", handleEnterKeyUp);
+    };
+  }, [messageContent]);
 
   async function startWebSocketServer() {
     await axios.post("/api/socket");
@@ -122,19 +150,7 @@ const Chat = () => {
                 <FontAwesomeIcon
                   className="send-message-icon"
                   icon={faPaperPlane}
-                  onClick={async () => {
-                    if (messageContent) {
-                      const newMessage = {
-                        sender: session.data?.user?.name as string,
-                        content: messageContent,
-                        date: new Date(),
-                        type: "message",
-                      };
-
-                      const newMessageJson = JSON.stringify(newMessage);
-                      ws?.send(newMessageJson);
-                    }
-                  }}
+                  onClick={() => sendChatMessage()}
                 />
               </>
             ),
