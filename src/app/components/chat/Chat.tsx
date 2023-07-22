@@ -108,7 +108,11 @@ const Chat = () => {
 
   function isWebSocketServerRunning(): Promise<boolean> {
     return new Promise((resolve) => {
-      const ws = new WebSocket("ws://localhost:443");
+      const ws = new WebSocket(
+        process.env.NODE_ENV === "development"
+          ? "ws://localhost:443"
+          : `ws://${window.location.hostname}:443`
+      );
 
       ws.onopen = () => {
         resolve(true);
