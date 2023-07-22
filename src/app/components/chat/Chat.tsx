@@ -72,7 +72,7 @@ const Chat = () => {
     const ws = new WebSocket(
       process.env.NODE_ENV === "development"
         ? "ws://localhost:443"
-        : `ws://${window.location.hostname}:443`
+        : `wss://${window.location.hostname}:443`
     );
 
     ws.onopen = (event) => {
@@ -111,7 +111,7 @@ const Chat = () => {
       const ws = new WebSocket(
         process.env.NODE_ENV === "development"
           ? "ws://localhost:443"
-          : `ws://${window.location.hostname}:443`
+          : `wss://${window.location.hostname}:443`
       );
 
       ws.onopen = () => {
