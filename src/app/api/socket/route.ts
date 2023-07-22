@@ -8,7 +8,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     port: 443,
   });
 
-  const users: string[] = [];
+  const users = new Map();
 
   function sendDataToEachClient(wss: WebSocketServer, data: any) {
     const dataJson = JSON.stringify(data);
@@ -21,13 +21,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   wss.on("connection", (ws, req) => {
     ws.on("close", () => {
-      if (ws.user) {
-        const disconnectedUserIndex = users.findIndex(
-          (user) => user === ws.user
-        );
-        users.splice(disconnectedUserIndex, 1);
-        sendDataToEachClient(wss, { users, type: "users" });
-      }
+      users.delete(ws);
+      const usernames = users.values();
+      sendDataToEachClient(wss, {
+        users: Array.from(usernames),
+        type: "users",
+      });
     });
     ws.on("error", console.error);
     ws.on("message", async (data) => {
@@ -44,9 +43,12 @@ export async function POST(req: NextRequest, res: NextResponse) {
       }
 
       if (dataObj.type === "user-connected") {
-        ws.user = dataObj.username;
-        users.push(dataObj.username);
-        sendDataToEachClient(wss, { users, type: "users" });
+        users.set(ws, dataObj.username);
+        const usernames = users.values();
+        sendDataToEachClient(wss, {
+          users: Array.from(usernames),
+          type: "users",
+        });
       }
     });
   });
