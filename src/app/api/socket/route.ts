@@ -5,7 +5,7 @@ import { WebSocketServer } from "ws";
 export async function POST(req: NextRequest, res: NextResponse) {
   const chatService = new ChatService();
   const wss = new WebSocketServer({
-    port: process.env.PORT ? Number(process.env.PORT) : 443,
+    port: 8080,
   });
 
   const users = new Map();
