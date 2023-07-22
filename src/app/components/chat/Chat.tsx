@@ -69,7 +69,11 @@ const Chat = () => {
   }
 
   function connectToWebSocketServer() {
-    const ws = new WebSocket("ws://localhost:443");
+    const ws = new WebSocket(
+      process.env.NODE_ENV === "development"
+        ? "ws://localhost:443"
+        : `ws://${window.location.hostname}:443`
+    );
 
     ws.onopen = (event) => {
       const user = {
