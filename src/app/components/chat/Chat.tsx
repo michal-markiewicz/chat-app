@@ -51,7 +51,7 @@ const Chat = () => {
     });
   }, []);
 
-  const handleEnterKeyUp = (e) => {
+  const handleEnterKeyUp = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
       sendChatMessage();
     }
