@@ -56,7 +56,11 @@ const Chat = () => {
   }, [messageContent]);
 
   function connectToWebSocketServer() {
-    const ws = new WebSocket("ws://localhost:3000");
+    const ws = new WebSocket(
+      process.env.NODE_ENV === "production"
+        ? `wss://${window.location.host}`
+        : "ws://localhost:3000"
+    );
 
     ws.onopen = (event) => {
       const user = {
