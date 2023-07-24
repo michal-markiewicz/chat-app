@@ -2,7 +2,6 @@ import ChatService from "@/app/client/ChatService";
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, TextField, Typography } from "@mui/material";
-import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import ChatMessage, { Message } from "../chatMessage/ChatMessage";
@@ -33,15 +32,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (session.data?.user?.name) {
-      const initializeWebSocketConnection = async () => {
-        const isServerRunning = await isWebSocketServerRunning();
-        if (!isServerRunning) {
-          await startWebSocketServer();
-        }
-        connectToWebSocketServer();
-      };
-
-      initializeWebSocketConnection();
+      connectToWebSocketServer();
     }
   }, [session.data?.user?.name]);
 
@@ -64,16 +55,8 @@ const Chat = () => {
     };
   }, [messageContent]);
 
-  async function startWebSocketServer() {
-    await axios.post("/api/socket");
-  }
-
   function connectToWebSocketServer() {
-    const ws = new WebSocket(
-      process.env.NODE_ENV === "development"
-        ? "ws://localhost:443"
-        : `wss://${window.location.hostname}`
-    );
+    const ws = new WebSocket("ws://localhost:3000");
 
     ws.onopen = (event) => {
       const user = {
@@ -104,25 +87,6 @@ const Chat = () => {
     };
 
     setWs(ws);
-  }
-
-  function isWebSocketServerRunning(): Promise<boolean> {
-    return new Promise((resolve) => {
-      const ws = new WebSocket(
-        process.env.NODE_ENV === "development"
-          ? "ws://localhost:443"
-          : `wss://${window.location.hostname}`
-      );
-
-      ws.onopen = () => {
-        resolve(true);
-        ws.close();
-      };
-
-      ws.onerror = () => {
-        resolve(false);
-      };
-    });
   }
 
   return (
