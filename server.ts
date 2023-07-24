@@ -6,8 +6,8 @@ import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "127.0.0.1";
-const port = 3000;
+const hostname = dev ? "127.0.0.1" : undefined;
+const port = Number(process.env.PORT || 3000);
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
