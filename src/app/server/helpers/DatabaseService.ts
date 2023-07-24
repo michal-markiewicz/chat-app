@@ -1,6 +1,5 @@
 import { IDatabaseService } from "@/app/shared/contracts/IDatabaseService";
 import mysql2 from "mysql2/promise";
-import "./server-only";
 
 export default class DatabaseService implements IDatabaseService {
   async connect() {

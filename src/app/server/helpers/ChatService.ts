@@ -7,7 +7,6 @@ import {
 import dayjs from "dayjs";
 import { RowDataPacket } from "mysql2";
 import DatabaseService from "./DatabaseService";
-import "./server-only";
 
 export default class ChatService implements IChatService {
   databaseService: DatabaseService;

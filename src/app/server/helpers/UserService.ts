@@ -14,7 +14,6 @@ import DataValidator from "@/app/shared/helpers/DataValidator";
 import { RowDataPacket } from "mysql2";
 import DatabaseService from "./DatabaseService";
 import Hasher from "./Hasher";
-import "./server-only";
 
 class UserService implements IUserService {
   databaseService: IDatabaseService;
