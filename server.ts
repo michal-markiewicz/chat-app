@@ -1,3 +1,4 @@
+import "module-alias/register";
 import ChatService from "@/app/server/helpers/ChatService";
 import { createServer } from "http";
 import next from "next";

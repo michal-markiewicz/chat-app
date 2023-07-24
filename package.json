@@ -25,6 +25,7 @@
     "bcrypt": "^5.1.0",
     "dayjs": "^1.11.9",
     "lodash": "^4.17.21",
+    "module-alias": "^2.2.3",
     "mysql2": "^3.4.3",
     "next": "13.4.7",
     "next-auth": "^4.22.1",
@@ -51,5 +52,8 @@
   "optionalDependencies": {
     "bufferutil": "^4.0.7",
     "utf-8-validate": "^6.0.3"
+  },
+  "_moduleAliases": {
+    "@": "./dist/src"
   }
 }
