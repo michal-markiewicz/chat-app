@@ -1,7 +1,7 @@
 import ChatService from "@/app/client/ChatService";
 import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, CircularProgress, TextField, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import ChatMessage, { Message } from "../chatMessage/ChatMessage";
@@ -16,6 +16,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<string[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [loadingMessages, setLoadingMessages] = useState<boolean>(true);
 
   useEffect(() => {
     const username = session.data?.user?.name;
@@ -28,14 +29,12 @@ const Chat = () => {
   useEffect(() => {
     if (session.data?.user?.name) {
       connectToWebSocketServer();
+      chatService.fetchMessages().then((messages) => {
+        setMessages(messages);
+        setLoadingMessages(false);
+      });
     }
   }, [session.data?.user?.name]);
-
-  useEffect(() => {
-    chatService.fetchMessages().then((messages) => {
-      setMessages(messages);
-    });
-  }, []);
 
   useEffect(() => {
     window.addEventListener("keyup", handleEnterKeyUp);
@@ -101,6 +100,14 @@ const Chat = () => {
     };
 
     setWs(ws);
+  }
+
+  if (!ws || loadingMessages) {
+    return (
+      <Box className="flex items-center justify-center w-full h-full">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (

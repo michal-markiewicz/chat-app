@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import UserService from "../client/UserService";
 import DataValidator from "../shared/helpers/DataValidator";
 import "./register.css";
+import { LoadingButton } from "@mui/lab";
 
 const Register = () => {
   const session = useSession();
@@ -17,6 +18,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [passwordValidationError, setPasswordValidationError] = useState("");
   const [anyValidationErrors, setAnyValidationErrors] = useState(false);
+  const [processingData, setProcessingData] = useState(false);
 
   useEffect(() => {
     if (usernameValidationError || passwordValidationError) {
@@ -60,11 +62,13 @@ const Register = () => {
             );
           }}
         />
-        <Button
+        <LoadingButton
+          loading={processingData}
           variant="contained"
           className="w-36 mt-8"
           onClick={async () => {
             if (!anyValidationErrors) {
+              setProcessingData(true);
               const registrationResult = await userService.register({
                 username,
                 password,
@@ -78,12 +82,14 @@ const Register = () => {
 
               if (result?.ok) {
                 router.push("/");
+              } else {
+                setProcessingData(false);
               }
             }
           }}
         >
           Sign Up
-        </Button>
+        </LoadingButton>
         <Typography className="mt-8">
           Already have an account? <span className="link">Login</span> instead
         </Typography>
