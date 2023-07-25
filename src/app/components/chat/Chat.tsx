@@ -6,14 +6,49 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import ChatMessage, { Message } from "../chatMessage/ChatMessage";
 import "./Chat.css";
+import { useRouter } from "next/navigation";
 
 const Chat = () => {
+  const router = useRouter();
   const chatService = new ChatService();
   const session = useSession();
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<string[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    const username = session.data?.user?.name;
+
+    if (!username && session.status !== "loading") {
+      router.push("/register");
+    }
+  }, [session.status]);
+
+  useEffect(() => {
+    if (session.data?.user?.name) {
+      connectToWebSocketServer();
+    }
+  }, [session.data?.user?.name]);
+
+  useEffect(() => {
+    chatService.fetchMessages().then((messages) => {
+      setMessages(messages);
+    });
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("keyup", handleEnterKeyUp);
+    return () => {
+      window.removeEventListener("keyup", handleEnterKeyUp);
+    };
+  }, [messageContent]);
+
+  const handleEnterKeyUp = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      sendChatMessage();
+    }
+  };
 
   function sendChatMessage() {
     if (messageContent) {
@@ -29,31 +64,6 @@ const Chat = () => {
       ws?.send(newMessageJson);
     }
   }
-
-  useEffect(() => {
-    if (session.data?.user?.name) {
-      connectToWebSocketServer();
-    }
-  }, [session.data?.user?.name]);
-
-  useEffect(() => {
-    chatService.fetchMessages().then((messages) => {
-      setMessages(messages);
-    });
-  }, []);
-
-  const handleEnterKeyUp = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      sendChatMessage();
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keyup", handleEnterKeyUp);
-    return () => {
-      window.removeEventListener("keyup", handleEnterKeyUp);
-    };
-  }, [messageContent]);
 
   function connectToWebSocketServer() {
     const ws = new WebSocket(
