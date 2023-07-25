@@ -21,12 +21,22 @@ const Register = () => {
   const [processingData, setProcessingData] = useState(false);
 
   useEffect(() => {
+    if (session.status === "authenticated") {
+      router.push("/");
+    }
+  }, [session.status]);
+
+  useEffect(() => {
     if (usernameValidationError || passwordValidationError) {
       setAnyValidationErrors(true);
     } else {
       setAnyValidationErrors(false);
     }
   }, [usernameValidationError, passwordValidationError]);
+
+  if (session.status === "loading" || session.status === "authenticated") {
+    return <></>;
+  }
 
   return (
     <Box className="register-page-wrapper flex justify-center items-center flex-col w-screen h-screen">
