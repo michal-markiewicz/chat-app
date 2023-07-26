@@ -3,7 +3,7 @@ import { faPaperPlane } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Box, CircularProgress, TextField, Typography } from "@mui/material";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { ElementRef, useEffect, useRef, useState } from "react";
 import ChatMessage, { Message } from "../chatMessage/ChatMessage";
 import "./Chat.css";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ const Chat = () => {
   const router = useRouter();
   const chatService = new ChatService();
   const session = useSession();
+  const chatElem = useRef<HTMLElement | null>(null);
   const [messageContent, setMessageContent] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<string[]>([]);
@@ -25,6 +26,12 @@ const Chat = () => {
       router.push("/register");
     }
   }, [session.status]);
+
+  useEffect(() => {
+    if (chatElem.current) {
+      chatElem.current.scrollTop = chatElem.current.scrollHeight;
+    }
+  }, [messages.length]);
 
   useEffect(() => {
     if (session.data?.user?.name) {
@@ -112,7 +119,7 @@ const Chat = () => {
 
   return (
     <Box className="chat-container flex w-full h-full flex-col items-center">
-      <Box className="chat-messages w-11/12 h-full pb-4">
+      <Box className="chat-messages w-11/12 h-full pb-4" ref={chatElem}>
         {messages.map((message) => {
           return <ChatMessage {...message} />;
         })}
